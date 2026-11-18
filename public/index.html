@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b10">
+  <meta name="description" content="THEURIQ-AI - Your personal AI intelligence and development platform.">
+  <title>THEURIQ-AI | Intelligence Studio</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">T</div>
+        <div>
+          <h2>THEURIQ<span>AI</span></h2>
+          <small>INTELLIGENCE STUDIO</small>
+        </div>
+      </div>
+
+      <button class="new-chat" id="newChat">
+        <span>＋</span> New conversation
+      </button>
+
+      <div class="nav-section">
+        <p class="section-label">WORKSPACE</p>
+
+        <button class="nav-item active" data-panel="chat">
+          <span>◈</span> AI Assistant
+        </button>
+
+        <button class="nav-item" data-panel="projects">
+          <span>▣</span> My Projects
+        </button>
+
+        <button class="nav-item" data-panel="developer">
+          <span>⌘</span> Developer Studio
+        </button>
+
+        <button class="nav-item" data-panel="research">
+          <span>◎</span> Research Studio
+        </button>
+
+        <button class="nav-item" data-panel="creator">
+          <span>✧</span> Creator Studio
+        </button>
+
+        <button class="nav-item" data-panel="automation">
+          <span>⚙</span> Automation
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <p class="section-label">PERSONAL</p>
+        <button class="nav-item" data-panel="history">
+          <span>◷</span> Recent activity
+        </button>
+        <button class="nav-item" data-panel="settings">
+          <span>⚙</span> Settings
+        </button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="user-card">
+          <div class="avatar">T</div>
+          <div class="user-details">
+            <strong>My Workspace</strong>
+            <small>Personal edition</small>
+          </div>
+          <span class="online-dot"></span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main-area">
+
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="menuToggle" aria-label="Toggle sidebar">☰</button>
+          <div class="breadcrumb">
+            <span>THEURIQ-AI</span>
+            <span class="breadcrumb-separator">/</span>
+            <strong id="pageTitle">AI Assistant</strong>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="status-indicator">
+            <span class="online-dot"></span>
+            System ready
+          </div>
+          <button class="icon-button" id="settingsButton" aria-label="Settings">⚙</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+
+        <!-- CENTER CONTENT -->
+        <section class="content-area" id="contentArea">
+
+          <div class="welcome-area">
+            <div class="welcome-tag">
+              <span class="online-dot"></span>
+              YOUR PERSONAL INTELLIGENCE
+            </div>
+
+            <h1>Think bigger.<br><span>Build beyond limits.</span></h1>
+
+            <p>
+              Welcome to THEURIQ-AI. Your intelligent workspace
+              for creating, developing, researching and exploring ideas.
+            </p>
+
+            <div class="capability-grid">
+              <button class="capability-card" data-prompt="Help me plan a software project">
+                <span class="capability-icon">⌘</span>
+                <strong>Build software</strong>
+                <small>Turn ideas into applications</small>
+              </button>
+
+              <button class="capability-card" data-prompt="Help me debug my code">
+                <span class="capability-icon">⌘</span>
+                <strong>Debug code</strong>
+                <small>Find and fix programming errors</small>
+              </button>
+
+              <button class="capability-card" data-prompt="Research a topic for me">
+                <span class="capability-icon">◎</span>
+                <strong>Research</strong>
+                <small>Explore knowledge and ideas</small>
+              </button>
+
+              <button class="capability-card" data-prompt="Help me create something new">
+                <span class="capability-icon">✧</span>
+                <strong>Create</strong>
+                <small>Develop new creative projects</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- CONVERSATION -->
+          <div class="conversation" id="conversation" hidden></div>
+
+          <!-- MESSAGE COMPOSER -->
+          <div class="composer">
+            <div class="composer-box">
+              <textarea
+                id="messageInput"
+                placeholder="Ask THEURIQ anything..."
+                rows="2"
+                aria-label="Message THEURIQ-AI"
+              ></textarea>
+
+              <div class="composer-bottom">
+                <div class="composer-tools">
+                  <button type="button" class="tool-button" id="attachButton">
+                    ＋ Attach
+                  </button>
+                  <span class="model-label">AI MODEL: AUTO</span>
+                </div>
+
+                <button type="button" class="send-button" id="sendButton" aria-label="Send message">
+                  ↑
+                </button>
+              </div>
+            </div>
+
+            <p class="disclaimer">
+              THEURIQ-AI can make mistakes. Verify important information.
+            </p>
+          </div>
+
+        </section>
+
+        <!-- RIGHT AI PANEL -->
+        <aside class="assistant-panel">
+          <div class="panel-header">
+            <div>
+              <strong>THEURIQ INTELLIGENCE</strong>
+              <small>AI CONTROL CENTER</small>
+            </div>
+            <span class="online-dot"></span>
+          </div>
+
+          <div class="panel-content">
+
+            <div class="intelligence-card">
+              <div class="intelligence-symbol">✧</div>
+              <h3>Ready to think.</h3>
+              <p>Your AI workspace is ready for your next idea.</p>
+            </div>
+
+            <div class="panel-section">
+              <p class="section-label">CURRENT MODE</p>
+              <div class="mode-card">
+                <span>◈</span>
+                <div>
+                  <strong>General Intelligence</strong>
+                  <small>Automatic task routing</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <p class="section-label">SYSTEM STATUS</p>
+              <div class="status-row">
+                <span>Backend</span>
+                <span class="status-pending" id="backendStatus">Checking...</span>
+              </div>
+              <div class="status-row">
+                <span>AI connection</span>
+                <span class="status-pending">Not configured</span>
+              </div>
+              <div class="status-row">
+                <span>Project memory</span>
+                <span class="status-pending">Coming soon</span>
+              </div>
+            </div>
+
+            <div class="panel-section">
+              <p class="section-label">QUICK ACCESS</p>
+              <button class="quick-link" data-panel="projects">＋ Create a project</button>
+              <button class="quick-link" data-panel="developer">⌘ Open Developer Studio</button>
+              <button class="quick-link" data-panel="settings">⚙ Configure workspace</button>
+            </div>
+
+          </div>
+
+          <div class="panel-footer">
+            THEURIQ-AI v1.0.0
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/app.js" defer></script>
+</body>
+</html>
