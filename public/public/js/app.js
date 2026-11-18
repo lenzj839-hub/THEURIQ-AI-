@@ -24,7 +24,7 @@ let messages = [];
 let activePanel = "chat";
 
 // ========================================
-// NOTIFICATION
+// NOTIFICATIONS
 // ========================================
 
 function notify(message) {
@@ -39,9 +39,9 @@ function notify(message) {
       bottom: "25px",
       left: "50%",
       transform: "translateX(-50%)",
-      background: "#24213a",
+      background: "#211638",
       color: "#ffffff",
-      border: "1px solid #51457f",
+      border: "1px solid #7040a7",
       padding: "12px 18px",
       borderRadius: "10px",
       zIndex: "9999",
@@ -76,12 +76,15 @@ function navigate(panel) {
     developer: "Developer Studio",
     research: "Research Studio",
     creator: "Creator Studio",
-    automation: "Automation Studio",
+    automation: "Automation",
     history: "Recent Activity",
     settings: "Settings"
   };
 
-  elements.pageTitle.textContent = titles[panel] || "Workspace";
+  if (elements.pageTitle) {
+    elements.pageTitle.textContent =
+      titles[panel] || "Workspace";
+  }
 
   document.querySelectorAll(".nav-item").forEach(button => {
     button.classList.toggle(
@@ -97,7 +100,7 @@ function navigate(panel) {
     elements.welcomeArea.hidden = true;
     elements.conversation.hidden = false;
 
-    elements.conversation.innerHTML = "";
+    elements.conversation.replaceChildren();
 
     const section = document.createElement("div");
     section.className = "message assistant";
@@ -107,16 +110,38 @@ function navigate(panel) {
     heading.textContent = "THEURIQ-AI WORKSPACE";
 
     const description = document.createElement("p");
+
+    const descriptions = {
+      projects:
+        "Your project workspace. Project management features will be added in a future development phase.",
+
+      developer:
+        "Developer Studio is planned for code generation, project analysis and debugging.",
+
+      research:
+        "Research Studio is planned for research and information exploration.",
+
+      creator:
+        "Creator Studio is planned for creative workflows.",
+
+      automation:
+        "Automation features are planned for a future development phase.",
+
+      history:
+        "Your recent activity will appear here when conversation history is implemented.",
+
+      settings:
+        "Workspace settings will be added in a future development phase."
+    };
+
     description.textContent =
-      panel === "developer"
-        ? "Developer Studio will provide code generation, project analysis, debugging and an integrated editor."
-        : `${titles[panel]} is part of the THEURIQ-AI ecosystem. This module will be implemented in an upcoming development phase.`;
+      descriptions[panel] || `${titles[panel]} is not available yet.`;
 
     section.append(heading, description);
     elements.conversation.appendChild(section);
   }
 
-  if (window.innerWidth <= 700) {
+  if (window.innerWidth <= 700 && elements.sidebar) {
     elements.sidebar.classList.remove("open");
   }
 }
@@ -131,9 +156,11 @@ document.querySelectorAll("[data-panel]").forEach(button => {
 // MOBILE SIDEBAR
 // ========================================
 
-elements.menuToggle.addEventListener("click", () => {
-  elements.sidebar.classList.toggle("open");
-});
+if (elements.menuToggle && elements.sidebar) {
+  elements.menuToggle.addEventListener("click", () => {
+    elements.sidebar.classList.toggle("open");
+  });
+}
 
 // ========================================
 // CONVERSATION
@@ -145,6 +172,7 @@ function addMessage(role, content) {
 
   const label = document.createElement("span");
   label.className = "message-role";
+
   label.textContent =
     role === "user" ? "YOU" : "THEURIQ-AI";
 
@@ -152,10 +180,41 @@ function addMessage(role, content) {
   body.textContent = content;
 
   message.append(label, body);
+
   elements.conversation.appendChild(message);
 
   elements.conversation.scrollTop =
     elements.conversation.scrollHeight;
+}
+
+// ========================================
+// API RESPONSE HANDLING
+// ========================================
+
+async function readResponse(response) {
+  const raw = await response.text();
+
+  let data;
+
+  try {
+    data = raw ? JSON.parse(raw) : {};
+  } catch {
+    throw new Error(
+      response.ok
+        ? "The server returned an unreadable response."
+        : `Server error (${response.status}). Please try again.`
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data.error ||
+      data.message ||
+      `Request failed (${response.status}).`
+    );
+  }
+
+  return data;
 }
 
 // ========================================
@@ -187,21 +246,22 @@ async function sendMessage() {
   try {
     const response = await fetch(`${API_BASE}/chat`, {
       method: "POST",
+
       headers: {
         "Content-Type": "application/json"
       },
+
       body: JSON.stringify({
         message: prompt
       })
     });
 
-    const data = await response.json();
+    const data = await readResponse(response);
 
-    if (!response.ok) {
-      throw new Error(data.error || "Request failed");
-    }
-
-    const answer = data.reply || "No response received.";
+    const answer =
+      data.reply ||
+      data.message ||
+      "No response received.";
 
     messages.push({
       role: "assistant",
@@ -211,11 +271,14 @@ async function sendMessage() {
     addMessage("assistant", answer);
 
   } catch (error) {
-    console.error("THEURIQ error:", error);
+    console.error("THEURIQ-AI request failed:", error);
 
     addMessage(
       "assistant",
-      "The AI service is not connected yet. Our backend and AI integration will be configured in the next development phases."
+      `I couldn't complete that request. ${
+        error.message ||
+        "Check your connection and try again."
+      }`
     );
 
   } finally {
@@ -224,33 +287,56 @@ async function sendMessage() {
   }
 }
 
-elements.sendButton.addEventListener("click", sendMessage);
+// ========================================
+// SEND BUTTON
+// ========================================
 
-elements.messageInput.addEventListener("keydown", event => {
-  if (
-    event.key === "Enter" &&
-    !event.shiftKey
-  ) {
-    event.preventDefault();
-    sendMessage();
-  }
-});
+if (elements.sendButton) {
+  elements.sendButton.addEventListener(
+    "click",
+    sendMessage
+  );
+}
+
+// ========================================
+// ENTER TO SEND
+// ========================================
+
+if (elements.messageInput) {
+  elements.messageInput.addEventListener(
+    "keydown",
+    event => {
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+  );
+}
 
 // ========================================
 // NEW CONVERSATION
 // ========================================
 
-elements.newChat.addEventListener("click", () => {
-  messages = [];
+if (elements.newChat) {
+  elements.newChat.addEventListener("click", () => {
+    messages = [];
 
-  elements.conversation.innerHTML = "";
-  elements.conversation.hidden = true;
-  elements.welcomeArea.hidden = false;
-  elements.messageInput.value = "";
+    elements.conversation.replaceChildren();
 
-  navigate("chat");
-  notify("New conversation started.");
-});
+    elements.conversation.hidden = true;
+    elements.welcomeArea.hidden = false;
+
+    elements.messageInput.value = "";
+
+    navigate("chat");
+
+    notify("New conversation started.");
+  });
+}
 
 // ========================================
 // QUICK PROMPTS
@@ -259,42 +345,56 @@ elements.newChat.addEventListener("click", () => {
 document.querySelectorAll("[data-prompt]").forEach(button => {
   button.addEventListener("click", () => {
     navigate("chat");
-    elements.messageInput.value = button.dataset.prompt;
+
+    elements.messageInput.value =
+      button.dataset.prompt;
+
     elements.messageInput.focus();
   });
 });
 
 // ========================================
-// ATTACHMENT PLACEHOLDER
+// ATTACHMENTS
 // ========================================
 
-document.getElementById("attachButton").addEventListener(
-  "click",
-  () => {
-    notify("File attachments will be available in a future update.");
-  }
-);
+const attachButton =
+  document.getElementById("attachButton");
+
+if (attachButton) {
+  attachButton.addEventListener("click", () => {
+    notify("File attachments are not available yet.");
+  });
+}
 
 // ========================================
 // SETTINGS BUTTON
 // ========================================
 
-document.getElementById("settingsButton").addEventListener(
-  "click",
-  () => navigate("settings")
-);
+const settingsButton =
+  document.getElementById("settingsButton");
+
+if (settingsButton) {
+  settingsButton.addEventListener("click", () => {
+    navigate("settings");
+  });
+}
 
 // ========================================
 // BACKEND HEALTH CHECK
 // ========================================
 
 async function checkBackend() {
+  if (!elements.backendStatus) return;
+
   try {
     const response = await fetch(`${API_BASE}/health`);
-    const data = await response.json();
 
-    if (!response.ok || !data.ok) {
-      throw new Error("Backend unavailable");
+    const data = await readResponse(response);
+
+    if (!data.ok) {
+      throw new Error(
+        "Health check did not confirm the backend."
+      );
     }
 
     elements.backendStatus.textContent = "Online";
@@ -304,7 +404,10 @@ async function checkBackend() {
     elements.backendStatus.textContent = "Offline";
     elements.backendStatus.style.color = "#ff7474";
 
-    console.error("Backend health check failed:", error);
+    console.error(
+      "Backend health check failed:",
+      error
+    );
   }
 }
 
@@ -315,7 +418,9 @@ async function checkBackend() {
 async function initialize() {
   await checkBackend();
 
-  console.log("THEURIQ-AI frontend initialized.");
+  console.log(
+    "THEURIQ-AI frontend initialized."
+  );
 }
 
 initialize();
