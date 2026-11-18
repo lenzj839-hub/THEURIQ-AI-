@@ -734,6 +734,556 @@ button {
   .welcome-area h1 {
     font-size: 32px;
   }
+  
+/* =========================================
+   THEURIQ-AI — INTELLIGENCE STUDIO REDESIGN
+   ========================================= */
+
+:root {
+  --bg: #050611;
+  --sidebar: #080916;
+  --panel: #101027;
+  --surface: #15152f;
+  --surface-hover: #211b42;
+  --border: #29234c;
+  --text: #f7f5ff;
+  --muted: #aaa5c9;
+  --accent: #851cff;
+  --accent-light: #bd83ff;
+  --cyan: #39bfff;
+  --success: #16e69a;
+  --radius: 17px;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 75% 20%, #32106b33, transparent 38%),
+    radial-gradient(ellipse at 50% 100%, #160b3a44, transparent 45%),
+    var(--bg);
+  color: var(--text);
+}
+
+/* SIDEBAR */
+
+.sidebar {
+  width: 265px;
+  min-width: 265px;
+  background: linear-gradient(180deg, #090916, #080713);
+  border-right: 1px solid #34205b;
+  padding: 25px 16px;
+}
+
+.brand {
+  padding: 5px 8px 35px;
+  gap: 13px;
+}
+
+.brand-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #bd64ff, #6500ff);
+  box-shadow: 0 0 28px #851cff66;
+  font-size: 27px;
+}
+
+.brand h2 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.brand h2 span {
+  color: #ad50ff;
+}
+
+.brand small {
+  color: #aaa0ca;
+  letter-spacing: 1.7px;
+}
+
+.new-chat {
+  background: linear-gradient(110deg, #8e16ff, #5900d8);
+  border: 1px solid #a64cff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 5px 25px #7800ff30;
+  transition: .2s;
+}
+
+.new-chat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 28px #7800ff66;
+}
+
+.section-label {
+  color: #9d8cce;
+  font-size: 10px;
+  letter-spacing: 1.7px;
+}
+
+.nav-section {
+  margin-bottom: 27px;
+}
+
+.nav-item {
+  color: #c0bad9;
+  padding: 13px 12px;
+  border-radius: 11px;
+  margin-bottom: 5px;
+  transition: .2s;
+}
+
+.nav-item span {
+  color: #bd91ff;
+  font-size: 19px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: linear-gradient(100deg, #5310a8, #241047);
+  color: white;
+  box-shadow: inset 3px 0 #bd64ff;
+}
+
+.user-card {
+  border: 1px solid #35245f;
+  border-radius: 13px;
+  padding: 13px 9px;
+  background: #100d21;
+}
+
+.avatar {
+  background: linear-gradient(135deg, #a52bff, #5300db);
+  box-shadow: 0 0 17px #8c24ff55;
+}
+
+/* TOP BAR */
+
+.topbar {
+  height: 72px;
+  min-height: 72px;
+  padding: 0 30px;
+  background: #080816dd;
+  border-bottom: 1px solid #292044;
+  backdrop-filter: blur(15px);
+}
+
+.breadcrumb {
+  font-size: 13px;
+}
+
+.breadcrumb strong {
+  color: #d8c5ff;
+}
+
+.icon-button {
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+
+.icon-button:hover {
+  background: #21163c;
+  border-color: #6033a2;
+}
+
+.status-indicator {
+  color: #c5bce0;
+  font-size: 12px;
+}
+
+/* MAIN WORKSPACE */
+
+.workspace {
+  background:
+    radial-gradient(ellipse at 75% 15%, #3d087522, transparent 40%),
+    transparent;
+}
+
+.content-area {
+  padding: 30px 35px 15px;
+  background: transparent;
+}
+
+.assistant-panel {
+  display: none;
+}
+
+.welcome-area {
+  width: 100%;
+  max-width: 1150px;
+  padding: 25px 0 30px;
+  margin: auto auto 15px;
+  position: relative;
+}
+
+.welcome-tag {
+  background: #170d2b;
+  border: 1px solid #7433bc;
+  color: #d5b4ff;
+  border-radius: 30px;
+  padding: 10px 15px;
+  font-size: 10px;
+  box-shadow: 0 0 20px #851cff20;
+}
+
+.welcome-area h1 {
+  font-size: clamp(38px, 5vw, 66px);
+  line-height: 1.08;
+  letter-spacing: -2.5px;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.welcome-area h1 span {
+  background: linear-gradient(100deg, #c18aff, #8d35ff, #53bfff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.welcome-area > p {
+  max-width: 650px;
+  color: #b5b0cc;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* CAPABILITY CARDS */
+
+.capability-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-top: 40px;
+}
+
+.capability-card {
+  min-height: 170px;
+  padding: 20px;
+  border-radius: 17px;
+  background: linear-gradient(145deg, #19132f, #0d1125);
+  border: 1px solid #51228a;
+  position: relative;
+  overflow: hidden;
+  transition: .25s ease;
+}
+
+.capability-card:nth-child(2) {
+  background: linear-gradient(145deg, #101c3d, #0b1025);
+  border-color: #174fa7;
+}
+
+.capability-card:nth-child(3) {
+  background: linear-gradient(145deg, #0b302a, #0b1722);
+  border-color: #087e64;
+}
+
+.capability-card:nth-child(4) {
+  background: linear-gradient(145deg, #36200e, #17101d);
+  border-color: #9b5519;
+}
+
+.capability-card::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  right: -65px;
+  bottom: -75px;
+  border-radius: 50%;
+  background: #a32cff;
+  filter: blur(45px);
+  opacity: .25;
+}
+
+.capability-card:hover {
+  transform: translateY(-5px);
+  border-color: #bb70ff;
+  box-shadow: 0 8px 30px #7e18ff25;
+  background: #201638;
+}
+
+.capability-icon {
+  font-size: 30px;
+  color: #b65bff;
+  margin-bottom: 20px;
+}
+
+.capability-card:nth-child(2) .capability-icon {
+  color: #38aaff;
+}
+
+.capability-card:nth-child(3) .capability-icon {
+  color: #13e8a0;
+}
+
+.capability-card:nth-child(4) .capability-icon {
+  color: #ffb23f;
+}
+
+.capability-card strong {
+  font-size: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.capability-card small {
+  color: #bcb5d5;
+  font-size: 12px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+/* CHAT COMPOSER */
+
+.composer {
+  max-width: 1150px;
+  width: 100%;
+  margin: auto auto 0;
+  padding-bottom: 5px;
+}
+
+.composer-box {
+  background: linear-gradient(120deg, #17132f, #101328);
+  border: 1px solid #7632c9;
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 0 25px #831cff20;
+}
+
+.composer-box:focus-within {
+  border-color: #bd70ff;
+  box-shadow: 0 0 30px #851cff35;
+}
+
+.composer textarea {
+  min-height: 48px;
+  font-size: 15px;
+  padding: 10px;
+  color: white;
+}
+
+.composer textarea::placeholder {
+  color: #aaa0cb;
+}
+
+.composer-bottom {
+  padding-top: 12px;
+}
+
+.composer-tools {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tool-button {
+  background: #20183c;
+  border: 1px solid #493374;
+  color: #e1d5ff;
+  border-radius: 25px;
+  padding: 9px 15px;
+  transition: .2s;
+}
+
+.tool-button:hover {
+  background: #392064;
+  border-color: #a45aff;
+}
+
+.model-label {
+  color: #b9a7e3;
+  font-size: 10px;
+}
+
+.send-button {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a72cff, #6500e9);
+  box-shadow: 0 0 22px #851cff66;
+  font-size: 25px;
+  transition: .2s;
+}
+
+.send-button:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 30px #a42cff99;
+}
+
+.disclaimer {
+  color: #8881a9;
+  font-size: 10px;
+  padding: 13px 0;
+}
+
+/* CONVERSATION */
+
+.conversation {
+  max-width: 1150px;
+}
+
+.message {
+  border-radius: 15px;
+  padding: 17px;
+}
+
+.message.user {
+  background: linear-gradient(120deg, #39205e, #21163b);
+  border: 1px solid #6235a0;
+}
+
+.message.assistant {
+  background: #111326;
+  border: 1px solid #34244f;
+}
+
+.message-role {
+  color: #c08aff;
+}
+
+/* SCROLLBARS */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #63339c #0a0916;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0916;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #63339c;
+  border-radius: 10px;
+}
+
+/* TABLET */
+
+@media (max-width: 1050px) {
+  .content-area {
+    padding: 25px;
+  }
+
+  .capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 270px;
+    min-width: 270px;
+    background: #090816;
+    border-right: 1px solid #563080;
+  }
+
+  .topbar {
+    padding: 0 13px;
+  }
+
+  .content-area {
+    padding: 15px 14px 8px;
+  }
+
+  .welcome-area {
+    padding: 25px 0 20px;
+  }
+
+  .welcome-tag {
+    font-size: 9px;
+    padding: 8px 11px;
+  }
+
+  .welcome-area h1 {
+    font-size: clamp(34px, 9vw, 44px);
+    letter-spacing: -1.7px;
+  }
+
+  .welcome-area > p {
+    font-size: 13px;
+  }
+
+  .capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 27px;
+  }
+
+  .capability-card {
+    min-height: 145px;
+    padding: 14px;
+  }
+
+  .capability-icon {
+    font-size: 25px;
+    margin-bottom: 14px;
+  }
+
+  .capability-card strong {
+    font-size: 13px;
+  }
+
+  .capability-card small {
+    font-size: 10px;
+  }
+
+  .composer {
+    padding-bottom: 4px;
+  }
+
+  .composer-box {
+    padding: 11px;
+    border-radius: 15px;
+  }
+
+  .composer textarea {
+    font-size: 14px;
+  }
+
+  .tool-button {
+    padding: 8px 11px;
+    font-size: 10px;
+  }
+
+  .send-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .disclaimer {
+    font-size: 9px;
+  }
+
+  .message.user {
+    margin-left: 5%;
+  }
+}
+
+@media (max-width: 360px) {
+  .welcome-area h1 {
+    font-size: 32px;
+  }
+
+  .capability-card {
+    padding: 11px;
+  }
+
+  .capability-card small {
+    font-size: 9px;
+  }
+
+  .model-label {
+    font-size: 8px;
+  }
+}
+
 
   .capability-card {
     padding: 10px;
