@@ -1,8 +1,12 @@
+
+"use strict";
+
 require("dotenv").config();
 
 const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
+const fs = require("fs");
 
 const {
   executeRequest
@@ -11,40 +15,59 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// FIX 1: Zima CSP ya helmet ili inline JS (onclick) ifanye kazi.
-// Kila kitu kingine cha helmet bado kiko.
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
+const PUBLIC_DIR = path.join(__dirname, "public");
+const INDEX_FILE = path.join(PUBLIC_DIR, "index.html");
+
+// ========================================
+// SECURITY AND MIDDLEWARE
+// ========================================
+
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
+  })
+);
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "public")));
+// ========================================
+// FRONTEND STATIC FILES
+// ========================================
 
-// Health check - ORIGINAL YAKO BADO IPO
+app.use(express.static(PUBLIC_DIR));
+
+// ========================================
+// HEALTH CHECKS
+// ========================================
+
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
     app: "THEURIQ-AI",
     status: "running",
     intelligenceEngine: "initialized",
+    frontend: fs.existsSync(INDEX_FILE),
     version: "1.0.0"
   });
 });
 
-// FIX 2: Alias ili /health pia ifanye kazi
 app.get("/health", (req, res) => {
   res.json({
     ok: true,
     app: "THEURIQ-AI",
     status: "running",
     intelligenceEngine: "initialized",
+    frontend: fs.existsSync(INDEX_FILE),
     version: "1.0.0"
   });
 });
 
-// API information - BADO IPO KAMA ILIVYO
+// ========================================
+// API INFORMATION
+// ========================================
+
 app.get("/api", (req, res) => {
   res.json({
     name: "THEURIQ-AI",
@@ -62,7 +85,10 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Main AI chat endpoint - BADO IPO KAMA ILIVYO, SIJAGUSA
+// ========================================
+// MAIN AI CHAT ENDPOINT
+// ========================================
+
 app.post("/api/chat", async (req, res) => {
   try {
     const {
@@ -89,16 +115,18 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
+    const allowedModules = [
+      "chat",
+      "developer",
+      "research",
+      "creator",
+      "learning",
+      "automation"
+    ];
+
     if (
       module !== undefined &&
-      ![
-        "chat",
-        "developer",
-        "research",
-        "creator",
-        "learning",
-        "automation"
-      ].includes(module)
+      !allowedModules.includes(module)
     ) {
       return res.status(400).json({
         ok: false,
@@ -118,15 +146,22 @@ app.post("/api/chat", async (req, res) => {
 
     const result = await executeRequest(
       message,
-      { module, provider, model }
+      {
+        module,
+        provider,
+        model
+      }
     );
 
-    res.json(result);
+    return res.json(result);
 
   } catch (error) {
-    console.error("AI request failed:", error.message);
+    console.error(
+      "AI request failed:",
+      error.message
+    );
 
-    res.status(503).json({
+    return res.status(503).json({
       ok: false,
       error: "THEURIQ-AI could not complete this request.",
       details: error.message
@@ -134,14 +169,24 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-// Frontend
+// ========================================
+// FRONTEND ROUTE
+// ========================================
+
 app.get("/", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "public", "index.html")
-  );
+  if (!fs.existsSync(INDEX_FILE)) {
+    return res.status(500).send(
+      "Frontend file missing: public/index.html"
+    );
+  }
+
+  res.sendFile(INDEX_FILE);
 });
 
-// Unknown API endpoint
+// ========================================
+// UNKNOWN API ROUTES
+// ========================================
+
 app.use("/api", (req, res) => {
   res.status(404).json({
     ok: false,
@@ -149,9 +194,12 @@ app.use("/api", (req, res) => {
   });
 });
 
-// Error handler
+// ========================================
+// ERROR HANDLER
+// ========================================
+
 app.use((err, req, res, next) => {
-  console.error("Server error:", err.message);
+  console.error("Server error:", err);
 
   res.status(500).json({
     ok: false,
@@ -159,8 +207,20 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ========================================
+// START SERVER
+// ========================================
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(
     `THEURIQ-AI running on port ${PORT}`
+  );
+
+  console.log(
+    `Frontend file: ${INDEX_FILE}`
+  );
+
+  console.log(
+    `Frontend exists: ${fs.existsSync(INDEX_FILE)}`
   );
 });
