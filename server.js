@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -12,13 +11,18 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(helmet());
+// FIX 1: Zima CSP ya helmet ili inline JS (onclick) ifanye kazi.
+// Kila kitu kingine cha helmet bado kiko.
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
-// Health check
+// Health check - ORIGINAL YAKO BADO IPO
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
@@ -29,7 +33,18 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// API information
+// FIX 2: Alias ili /health pia ifanye kazi
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    app: "THEURIQ-AI",
+    status: "running",
+    intelligenceEngine: "initialized",
+    version: "1.0.0"
+  });
+});
+
+// API information - BADO IPO KAMA ILIVYO
 app.get("/api", (req, res) => {
   res.json({
     name: "THEURIQ-AI",
@@ -47,7 +62,7 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Main AI chat endpoint
+// Main AI chat endpoint - BADO IPO KAMA ILIVYO, SIJAGUSA
 app.post("/api/chat", async (req, res) => {
   try {
     const {
