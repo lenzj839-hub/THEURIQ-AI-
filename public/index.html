@@ -70,7 +70,7 @@
 <div class="app-container">
   <header class="topbar">
     <div class="brand"><div class="brand-logo">T</div><div class="brand-name">THEURIQ-AI</div></div>
-    <button id="menuToggle" class="icon-button" aria-label="Open menu">☰</button>
+    <button id="menuToggle" onclick="showToast('THEURIQ-AI v1.0 - Built by John')" class="icon-button" aria-label="Open menu">☰</button>
   </header>
   <main class="main-content">
     <section class="welcome-area" id="welcomeArea">
@@ -83,19 +83,19 @@
         <textarea id="messageInput" placeholder="Ask THEURIQ anything..." rows="2"></textarea>
         <div class="composer-footer">
           <div class="composer-tools">
-            <button id="attachButton" class="tool-button" type="button">＋ <span>Attach</span></button>
+            <button id="attachButton" onclick="showToast('Attach - chagua file (coming soon)')" class="tool-button" type="button">＋ <span>Attach</span></button>
             <span class="model-label">AI MODEL: AUTO</span>
           </div>
-          <button id="sendButton" class="send-button" type="button" aria-label="Send message">↑</button>
+          <button id="sendButton" onclick="sendMsg()" class="send-button" type="button" aria-label="Send message">↑</button>
         </div>
       </div>
       <section class="explore-section">
         <h2>EXPLORE</h2>
         <div class="capability-grid">
-          <button class="capability-card" data-prompt="Help me write code for a software project"><span class="capability-icon">⌘</span><span>Coding</span></button>
-          <button class="capability-card" data-prompt="Help me research a topic"><span class="capability-icon">⌕</span><span>Research</span></button>
-          <button class="capability-card" data-prompt="Help me create an image"><span class="capability-icon">✧</span><span>Image creation</span></button>
-          <button class="capability-card" data-prompt="Help me develop an idea"><span class="capability-icon">✦</span><span>Ideas &amp; learning</span></button>
+          <button class="capability-card" onclick="pickPrompt('Help me write code for a software project')" data-prompt="Help me write code for a software project"><span class="capability-icon">⌘</span><span>Coding</span></button>
+          <button class="capability-card" onclick="pickPrompt('Help me research a topic')" data-prompt="Help me research a topic"><span class="capability-icon">⌕</span><span>Research</span></button>
+          <button class="capability-card" onclick="pickPrompt('Help me create an image')" data-prompt="Help me create an image"><span class="capability-icon">✧</span><span>Image creation</span></button>
+          <button class="capability-card" onclick="pickPrompt('Help me develop an idea')" data-prompt="Help me develop an idea"><span class="capability-icon">✦</span><span>Ideas &amp; learning</span></button>
         </div>
       </section>
     </section>
@@ -104,79 +104,68 @@
     <div id="contentArea" hidden></div>
   </main>
   <nav class="bottom-navigation">
-    <button class="bottom-nav-item active" data-panel="chat"><span>◉</span><small>Chat</small></button>
-    <button class="bottom-nav-item" data-panel="projects"><span>▣</span><small>Projects</small></button>
-    <button class="bottom-nav-item" data-panel="history"><span>◷</span><small>History</small></button>
-    <button class="bottom-nav-item" data-panel="settings"><span>⚙</span><small>Settings</small></button>
+    <button class="bottom-nav-item active" onclick="navClick(this,'chat')" data-panel="chat"><span>◉</span><small>Chat</small></button>
+    <button class="bottom-nav-item" onclick="navClick(this,'projects')" data-panel="projects"><span>▣</span><small>Projects</small></button>
+    <button class="bottom-nav-item" onclick="navClick(this,'history')" data-panel="history"><span>◷</span><small>History</small></button>
+    <button class="bottom-nav-item" onclick="navClick(this,'settings')" data-panel="settings"><span>⚙</span><small>Settings</small></button>
   </nav>
   <div id="notification" hidden></div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('messageInput');
-  const sendBtn = document.getElementById('sendButton');
-  const attachBtn = document.getElementById('attachButton');
-  const welcome = document.getElementById('welcomeArea');
-  const convo = document.getElementById('conversation');
-  const notif = document.getElementById('notification');
-  const menu = document.getElementById('menuToggle');
-
-  function toast(m){
-    if(!notif) return;
-    notif.textContent = m; notif.hidden = false;
-    setTimeout(()=> notif.hidden = true, 2500);
+function showToast(m){
+  var n = document.getElementById('notification');
+  if(!n) return;
+  n.textContent = m; n.hidden = false;
+  setTimeout(function(){ n.hidden = true; }, 2500);
+}
+function pickPrompt(p){
+  var input = document.getElementById('messageInput');
+  if(input){ input.value = p; input.focus(); }
+  showToast('Prompt imewekwa - bonyeza Send');
+}
+function navClick(btn, panel){
+  document.querySelectorAll('.bottom-nav-item').forEach(function(x){ x.classList.remove('active'); });
+  btn.classList.add('active');
+  if(panel === 'chat'){
+    var w = document.getElementById('welcomeArea');
+    var c = document.getElementById('conversation');
+    if(w) w.style.display = 'block';
+    if(c) c.style.display = 'flex';
+  } else {
+    showToast(panel + ' - coming soon');
   }
-  function showChat(){
-    if(welcome) welcome.style.display='none';
-    if(convo){ convo.hidden=false; convo.style.display='flex'; }
-  }
-  function addMsg(text, me){
-    showChat();
-    const d = document.createElement('div');
-    d.textContent = text;
-    d.style.cssText = me
-      ? 'align-self:flex-end;background:#fff;color:#000;padding:12px 16px;border-radius:18px 18px 4px 18px;max-width:85%;font-size:15px;line-height:1.5;white-space:pre-wrap'
-      : 'align-self:flex-start;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:12px 16px;border-radius:18px 18px 18px 4px;max-width:85%;font-size:15px;line-height:1.5;white-space:pre-wrap';
-    convo.appendChild(d);
-    window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
-    return d;
-  }
-  function send(){
-    const t = input.value.trim();
-    if(!t){ toast('Andika kitu kwanza'); return; }
-    addMsg(t, true);
-    input.value='';
-    const th = addMsg('THEURIQ inafikiria...', false);
-    setTimeout(()=>{ th.textContent = 'Nimepokea: "'+t+'"\n\nUI sasa inafanya kazi! Backend ikiconnect nitakujibu kama AI kamili.'; }, 800);
-  }
-  if(sendBtn) sendBtn.addEventListener('click', send);
-  if(input) input.addEventListener('keydown', e => {
-    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }
-  });
-  document.querySelectorAll('.capability-card').forEach(c=>{
-    c.addEventListener('click', ()=>{
-      input.value = c.getAttribute('data-prompt');
-      input.focus();
-      toast('Prompt imewekwa - bonyeza Send');
+}
+function sendMsg(){
+  var input = document.getElementById('messageInput');
+  var convo = document.getElementById('conversation');
+  var welcome = document.getElementById('welcomeArea');
+  var text = input.value.trim();
+  if(!text){ showToast('Andika kitu kwanza'); return; }
+  if(welcome) welcome.style.display = 'none';
+  if(convo){ convo.hidden = false; convo.style.display = 'flex'; }
+  var my = document.createElement('div');
+  my.textContent = text;
+  my.style.cssText = 'align-self:flex-end;background:#fff;color:#000;padding:12px 16px;border-radius:18px 18px 4px 18px;max-width:85%;font-size:15px;line-height:1.5;white-space:pre-wrap';
+  convo.appendChild(my);
+  input.value = '';
+  var ai = document.createElement('div');
+  ai.textContent = 'THEURIQ inafikiria...';
+  ai.style.cssText = 'align-self:flex-start;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:12px 16px;border-radius:18px 18px 18px 4px;max-width:85%;font-size:15px;line-height:1.5;white-space:pre-wrap';
+  convo.appendChild(ai);
+  window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+  setTimeout(function(){
+    ai.textContent = 'Nimepokea: "' + text + '"\n\nUI sasa inafanya kazi! Backend ikiconnect nitakujibu kama AI kamili.';
+  }, 800);
+}
+window.addEventListener('load', function(){
+  setTimeout(function(){ showToast('App ime-load vizuri ✅'); }, 800);
+  var input = document.getElementById('messageInput');
+  if(input){
+    input.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }
     });
-  });
-  if(attachBtn) attachBtn.addEventListener('click', ()=> toast('Attach - chagua file (coming soon)'));
-  if(menu) menu.addEventListener('click', ()=> toast('THEURIQ-AI v1.0 - Built by John'));
-  document.querySelectorAll('.bottom-nav-item').forEach(b=>{
-    b.addEventListener('click', ()=>{
-      document.querySelectorAll('.bottom-nav-item').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active');
-      const p = b.getAttribute('data-panel');
-      if(p==='chat'){
-        if(welcome) welcome.style.display='block';
-        if(convo) convo.style.display='flex';
-      } else {
-        toast(p + ' - coming soon');
-      }
-    });
-  });
-  setTimeout(()=> toast('App ime-load vizuri ✅'), 1000);
+  }
 });
 </script>
 </body>
