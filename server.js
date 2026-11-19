@@ -8,19 +8,30 @@ const helmet = require("helmet");
 const path = require("path");
 const fs = require("fs");
 
-const {
-  executeRequest
-} = require("./src/engine/orchestrator");
+const { executeRequest } = require("./src/engine/orchestrator");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const PUBLIC_DIR = path.join(__dirname, "public");
+const ROOT_DIR = __dirname;
+const PUBLIC_DIR = path.join(ROOT_DIR, "public");
 const INDEX_FILE = path.join(PUBLIC_DIR, "index.html");
 
+const APP_VERSION = "1.1.0";
+
 // ========================================
-// SECURITY AND MIDDLEWARE
+// STARTUP VALIDATION
 // ========================================
+
+if (typeof executeRequest !== "function") {
+  throw new Error("AI orchestrator is not configured correctly.");
+}
+
+// ========================================
+// SECURITY
+// ========================================
+
+app.disable("x-powered-by");
 
 app.use(
   helmet({
@@ -29,38 +40,66 @@ app.use(
   })
 );
 
+// ========================================
+// REQUEST MIDDLEWARE
+// ========================================
+
 app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+  extended: true,
+  limit: "1mb"
+}));
 
 // ========================================
 // FRONTEND STATIC FILES
 // ========================================
 
-app.use(express.static(PUBLIC_DIR));
+app.use(
+  express.static(PUBLIC_DIR, {
+    index: false,
+    etag: true,
+    maxAge: "1h"
+  })
+);
 
 // ========================================
-// HEALTH CHECKS
+// HEALTH CHECK
 // ========================================
 
 app.get("/api/health", (req, res) => {
-  res.json({
+  res.set("Cache-Control", "no-store");
+
+  res.status(200).json({
     ok: true,
     app: "THEURIQ-AI",
     status: "running",
-    intelligenceEngine: "initialized",
+    version: APP_VERSION,
     frontend: fs.existsSync(INDEX_FILE),
-    version: "1.0.0"
+    aiEngine: "initialized",
+    timestamp: new Date().toISOString()
   });
 });
 
 app.get("/health", (req, res) => {
+  res.redirect(307, "/api/health");
+});
+
+// ========================================
+// DIAGNOSTICS
+// ========================================
+
+app.get("/api/diagnostics", (req, res) => {
+  res.set("Cache-Control", "no-store");
+
   res.json({
     ok: true,
     app: "THEURIQ-AI",
-    status: "running",
-    intelligenceEngine: "initialized",
-    frontend: fs.existsSync(INDEX_FILE),
-    version: "1.0.0"
+    version: APP_VERSION,
+    nodeVersion: process.version,
+    environment: process.env.NODE_ENV || "development",
+    frontendExists: fs.existsSync(INDEX_FILE),
+    orchestratorLoaded: typeof executeRequest === "function",
+    uptimeSeconds: Math.floor(process.uptime())
   });
 });
 
@@ -70,30 +109,35 @@ app.get("/health", (req, res) => {
 
 app.get("/api", (req, res) => {
   res.json({
+    ok: true,
     name: "THEURIQ-AI",
-    status: "online",
-    intelligence: "THEURIQ Intelligence Engine",
-    features: [
-      "AI Assistant",
-      "Developer Studio",
-      "Research Studio",
-      "Creator Studio",
-      "Learning Studio",
-      "Automation Studio",
-      "Project Intelligence"
+    description: "Personal Intelligence Studio",
+    version: APP_VERSION,
+    endpoints: {
+      health: "/api/health",
+      diagnostics: "/api/diagnostics",
+      chat: "POST /api/chat"
+    },
+    modules: [
+      "chat",
+      "developer",
+      "research",
+      "creator",
+      "learning",
+      "automation"
     ]
   });
 });
 
 // ========================================
-// MAIN AI CHAT ENDPOINT
+// AI CHAT
 // ========================================
 
 app.post("/api/chat", async (req, res) => {
   try {
     const {
       message,
-      module,
+      module = "chat",
       provider,
       model
     } = req.body || {};
@@ -111,7 +155,7 @@ app.post("/api/chat", async (req, res) => {
     if (message.length > 20000) {
       return res.status(413).json({
         ok: false,
-        error: "Message is too long."
+        error: "Message exceeds the 20,000 character limit."
       });
     }
 
@@ -124,10 +168,7 @@ app.post("/api/chat", async (req, res) => {
       "automation"
     ];
 
-    if (
-      module !== undefined &&
-      !allowedModules.includes(module)
-    ) {
+    if (!allowedModules.includes(module)) {
       return res.status(400).json({
         ok: false,
         error: "Invalid engine module."
@@ -145,7 +186,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const result = await executeRequest(
-      message,
+      message.trim(),
       {
         module,
         provider,
@@ -153,34 +194,33 @@ app.post("/api/chat", async (req, res) => {
       }
     );
 
-    return res.json(result);
+    return res.status(200).json(result);
 
   } catch (error) {
-    console.error(
-      "AI request failed:",
-      error.message
-    );
+    console.error("AI CHAT ERROR:", error);
 
     return res.status(503).json({
       ok: false,
-      error: "THEURIQ-AI could not complete this request.",
+      error: "THEURIQ-AI could not complete your request.",
       details: error.message
     });
   }
 });
 
 // ========================================
-// FRONTEND ROUTE
+// FRONTEND
 // ========================================
 
 app.get("/", (req, res) => {
+  res.set("Cache-Control", "no-store");
+
   if (!fs.existsSync(INDEX_FILE)) {
     return res.status(500).send(
-      "Frontend file missing: public/index.html"
+      "THEURIQ-AI frontend missing: public/index.html"
     );
   }
 
-  res.sendFile(INDEX_FILE);
+  return res.sendFile(INDEX_FILE);
 });
 
 // ========================================
@@ -195,13 +235,25 @@ app.use("/api", (req, res) => {
 });
 
 // ========================================
+// UNKNOWN PAGE ROUTES
+// ========================================
+
+app.use((req, res) => {
+  res.status(404).send("Page not found.");
+});
+
+// ========================================
 // ERROR HANDLER
 // ========================================
 
 app.use((err, req, res, next) => {
-  console.error("Server error:", err);
+  console.error("SERVER ERROR:", err);
 
-  res.status(500).json({
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.status || 500).json({
     ok: false,
     error: "Internal server error."
   });
@@ -212,15 +264,15 @@ app.use((err, req, res, next) => {
 // ========================================
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    `THEURIQ-AI running on port ${PORT}`
-  );
-
-  console.log(
-    `Frontend file: ${INDEX_FILE}`
-  );
-
-  console.log(
-    `Frontend exists: ${fs.existsSync(INDEX_FILE)}`
-  );
+  console.log("--------------------------------");
+  console.log("THEURIQ-AI STARTED");
+  console.log("--------------------------------");
+  console.log("Port:", PORT);
+  console.log("Version:", APP_VERSION);
+  console.log("Node:", process.version);
+  console.log("Root:", ROOT_DIR);
+  console.log("Frontend:", INDEX_FILE);
+  console.log("Frontend exists:", fs.existsSync(INDEX_FILE));
+  console.log("AI engine: loaded");
+  console.log("--------------------------------");
 });
