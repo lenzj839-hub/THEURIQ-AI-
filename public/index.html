@@ -2,624 +2,1158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#050611">
-  <meta name="description" content="THEURIQ-AI Intelligence Studio">
-  <title>THEURIQ-AI | Intelligence Studio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080916">
+<meta name="description" content="THEURIQ-AI Personal Intelligence Studio">
+<title>THEURIQ-AI | Intelligence Studio</title>
 
-  <style>
-    :root {
-      --bg: #050611;
-      --panel: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.12);
-      --accent: #7c5cff;
-      --accent2: #00e5ff;
-      --text: #ffffff;
-      --muted: #a1a1b8;
-    }
+<style>
+:root {
+  --bg: #070814;
+  --panel: rgba(255,255,255,.065);
+  --line: rgba(255,255,255,.12);
+  --purple: #7655f5;
+  --cyan: #00d9ef;
+  --text: #f8f8ff;
+  --muted: #a5a5ba;
+}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background:
-        radial-gradient(600px 400px at 15% 5%, rgba(124,92,255,.38), transparent 60%),
-        radial-gradient(500px 400px at 85% 15%, rgba(0,229,255,.22), transparent 60%),
-        radial-gradient(700px 500px at 50% 110%, rgba(255,61,138,.18), transparent 60%),
-        linear-gradient(180deg,#050611,#080916,#050611);
-    }
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(650px 450px at 8% 0%, rgba(103,65,224,.32), transparent 65%),
+    radial-gradient(600px 450px at 100% 12%, rgba(0,190,215,.18), transparent 65%),
+    linear-gradient(180deg,#080916,#080713 80%,#050610);
+  overflow-x: hidden;
+}
 
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.035) 1px, transparent 1px);
-      background-size: 44px 44px;
-    }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
 
-    button, textarea {
-      font: inherit;
-    }
+button, textarea, input {
+  font: inherit;
+}
 
-    button {
-      cursor: pointer;
-    }
+button {
+  cursor: pointer;
+  color: inherit;
+}
 
-    .app-container {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 0 16px 100px;
-      position: relative;
-    }
+#app {
+  position: relative;
+  z-index: 1;
+  max-width: 850px;
+  margin: auto;
+  min-height: 100vh;
+  padding: 0 16px 170px;
+}
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-    }
+header {
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-weight: 850;
+  font-size: 18px;
+  letter-spacing: .3px;
+}
 
-    .brand-logo {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      background: linear-gradient(135deg,var(--accent),var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 21px;
-      box-shadow: 0 0 25px rgba(124,92,255,.4);
-    }
+.logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg,var(--purple),var(--cyan));
+  font-size: 23px;
+  box-shadow: 0 0 28px #7655f54d;
+}
 
-    .brand-name {
-      font-weight: 800;
-      letter-spacing: .5px;
-      font-size: 17px;
-    }
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 23px;
+}
 
-    .icon-button {
-      width: 40px;
-      height: 40px;
-      border-radius: 11px;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      color: white;
-      font-size: 20px;
-    }
+#screen {
+  padding-bottom: 20px;
+}
 
-    .welcome-area {
-      padding-top: 35px;
-      text-align: center;
-    }
+.welcome {
+  text-align: center;
+  padding: 46px 5px 20px;
+}
 
-    .welcome-label {
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 13px;
-    }
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  font-weight: 750;
+}
 
-    .welcome-area h1 {
-      font-size: 34px;
-      line-height: 1.15;
-      font-weight: 800;
-      background: linear-gradient(90deg,#fff,#a78bfa,#00e5ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+h1 {
+  font-size: clamp(29px,7vw,43px);
+  line-height: 1.13;
+  margin: 14px 0;
+  background: linear-gradient(90deg,#fff,#b6a4ff,#65eaff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
 
-    .welcome-area p {
-      color: var(--muted);
-      margin-top: 12px;
-      font-size: 15px;
-      line-height: 1.6;
-    }
+.welcome p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
 
-    .composer {
-      margin-top: 26px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 13px;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 20px 50px rgba(0,0,0,.3);
-      text-align: left;
-    }
+.capabilities {
+  margin: 26px 0 10px;
+  text-align: left;
+}
 
-    .composer textarea {
-      width: 100%;
-      min-height: 55px;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: white;
-      font-size: 15px;
-      resize: none;
-      padding: 5px;
-    }
+.capabilities h2 {
+  font-size: 11px;
+  letter-spacing: 1.7px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
 
-    .composer textarea::placeholder {
-      color: #8b8b9e;
-    }
+.cap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 
-    .composer-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 9px;
-    }
+.cap-card {
+  min-height: 62px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-size: 13px;
+}
 
-    .composer-tools {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+.cap-card:active,
+.nav-btn:active,
+.icon-btn:active {
+  transform: scale(.97);
+}
 
-    .tool-button {
-      background: rgba(255,255,255,.08);
-      border: 1px solid var(--border);
-      color: white;
-      padding: 8px 13px;
-      border-radius: 999px;
-      font-size: 13px;
-    }
+.cap-icon {
+  font-size: 20px;
+}
 
-    .model-label {
-      font-size: 10px;
-      letter-spacing: .5px;
-      color: #c4c4d6;
-      font-weight: 600;
-    }
+#conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 0 10px;
+}
 
-    .send-button {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: white;
-      color: black;
-      font-size: 22px;
-      font-weight: 800;
-    }
+.msg {
+  max-width: 94%;
+  padding: 13px 15px;
+  border-radius: 16px;
+  line-height: 1.65;
+  font-size: 15px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
-    .explore-section {
-      margin-top: 30px;
-      text-align: left;
-    }
+.msg.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg,#6948db,#4931a4);
+  border-bottom-right-radius: 4px;
+}
 
-    .explore-section h2 {
-      font-size: 12px;
-      letter-spacing: 2px;
-      color: var(--muted);
-      margin-bottom: 13px;
-    }
+.msg.assistant {
+  align-self: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 4px;
+}
 
-    .capability-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+.msg.error {
+  border-color: #ff777777;
+}
 
-    .capability-card {
-      min-height: 65px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 13px;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-align: left;
-      font-size: 13px;
-    }
+.msg-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  opacity: .72;
+  margin-bottom: 5px;
+}
 
-    .capability-card:active {
-      transform: scale(.97);
-    }
+#panel {
+  padding: 25px 4px;
+}
 
-    .capability-icon {
-      font-size: 19px;
-    }
+.panel-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 20px;
+}
 
-    .conversation {
-      margin-top: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      padding-bottom: 20px;
-    }
+.panel-card h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
 
-    .message {
-      max-width: 95%;
-      padding: 13px 15px;
-      border-radius: 15px;
-      line-height: 1.6;
-      font-size: 14px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
+.muted {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
 
-    .message.user {
-      align-self: flex-end;
-      background: linear-gradient(135deg,#6045d8,#4933a8);
-      border-bottom-right-radius: 4px;
-    }
+.panel-action {
+  margin-top: 15px;
+  border: 0;
+  border-radius: 11px;
+  padding: 11px 15px;
+  background: linear-gradient(135deg,var(--purple),#5140b5);
+  font-weight: 700;
+}
 
-    .message.assistant {
-      align-self: flex-start;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-bottom-left-radius: 4px;
-    }
+.history-item {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 13px;
+  margin-top: 9px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
 
-    .message.error {
-      border-color: rgba(255,80,80,.5);
-    }
+.composer-wrap {
+  position: fixed;
+  z-index: 12;
+  left: 0;
+  right: 0;
+  bottom: 68px;
+  padding: 10px 14px 8px;
+  background: linear-gradient(180deg,transparent,rgba(6,7,18,.96) 25%);
+  pointer-events: none;
+}
 
-    #otherPanel {
-      margin-top: 25px;
-      padding: 22px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      min-height: 180px;
-    }
+.composer {
+  pointer-events: auto;
+  max-width: 820px;
+  margin: auto;
+  background: rgba(22,23,37,.96);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 22px;
+  padding: 11px;
+  box-shadow: 0 12px 38px #0008;
+  backdrop-filter: blur(18px);
+}
 
-    #otherPanel h2 {
-      font-size: 22px;
-      margin-bottom: 12px;
-    }
+#messageInput {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  max-height: 150px;
+  resize: none;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: white;
+  padding: 8px;
+  font-size: 15px;
+  line-height: 1.45;
+}
 
-    #otherPanel p {
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 14px;
-    }
+#messageInput::placeholder {
+  color: #9696a9;
+}
 
-    .bottom-navigation {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(5,6,17,.94);
-      backdrop-filter: blur(16px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 11px 0 calc(11px + env(safe-area-inset-bottom));
-      z-index: 10;
-    }
+.composer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 2px 0;
+}
 
-    .bottom-nav-item {
-      background: none;
-      border: none;
-      color: #8b8b9e;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      min-width: 55px;
-    }
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
 
-    .bottom-nav-item.active {
-      color: white;
-    }
+.tool-btn {
+  border: 1px solid var(--line);
+  background: #ffffff0c;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
 
-    .bottom-nav-item span {
-      font-size: 19px;
-    }
+.model-tag {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .5px;
+}
 
-    #notification {
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: white;
-      color: black;
-      padding: 11px 17px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-      z-index: 60;
-      max-width: 90%;
-      text-align: center;
-    }
+.send-btn {
+  width: 43px;
+  height: 43px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  font-size: 23px;
+  font-weight: 800;
+}
 
-    .menu-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.65);
-      z-index: 30;
-    }
+.send-btn:disabled {
+  opacity: .55;
+  cursor: wait;
+}
 
-    .menu-overlay.open {
-      display: block;
-    }
+.bottom-nav {
+  position: fixed;
+  z-index: 11;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  background: rgba(6,7,18,.97);
+  border-top: 1px solid var(--line);
+  padding: 9px 4px calc(9px + env(safe-area-inset-bottom));
+  backdrop-filter: blur(16px);
+}
 
-    .side-menu {
-      width: min(290px,85vw);
-      height: 100%;
-      background: #101321;
-      border-right: 1px solid var(--border);
-      padding: 24px 17px;
-      animation: slideIn .2s ease;
-    }
+.nav-btn {
+  background: transparent;
+  border: 0;
+  color: #9292a8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 62px;
+  font-size: 11px;
+}
 
-    @keyframes slideIn {
-      from { transform: translateX(-100%); }
-      to { transform: translateX(0); }
-    }
+.nav-btn .nav-icon {
+  font-size: 20px;
+}
 
-    .menu-heading {
-      font-size: 17px;
-      font-weight: 800;
-      margin-bottom: 25px;
-    }
+.nav-btn.active {
+  color: #fff;
+}
 
-    .menu-item {
-      width: 100%;
-      display: block;
-      text-align: left;
-      padding: 14px;
-      margin: 5px 0;
-      border: 1px solid transparent;
-      border-radius: 11px;
-      background: transparent;
-      color: white;
-      font-size: 14px;
-    }
+#toast {
+  position: fixed;
+  z-index: 50;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 90%;
+  background: #fff;
+  color: #111;
+  border-radius: 30px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 650;
+  box-shadow: 0 5px 25px #0008;
+}
 
-    .menu-item:active,
-    .menu-item:hover {
-      background: var(--panel);
-      border-color: var(--border);
-    }
+.menu-overlay {
+  display: none;
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  background: #000a;
+}
 
-    [hidden] {
-      display: none !important;
-    }
+.menu-overlay.open {
+  display: block;
+}
 
-    @media (min-width: 600px) {
-      .welcome-area {
-        padding-top: 55px;
-      }
+.side-menu {
+  width: min(310px,86vw);
+  height: 100%;
+  background: #101321;
+  border-right: 1px solid var(--line);
+  padding: 22px 17px;
+  box-shadow: 15px 0 40px #0007;
+}
 
-      .welcome-area h1 {
-        font-size: 44px;
-      }
-    }
-  </style>
+.menu-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-weight: 850;
+}
+
+.menu-item {
+  width: 100%;
+  display: block;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  padding: 14px;
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.menu-item:active,
+.menu-item:hover {
+  background: var(--panel);
+  border-color: var(--line);
+}
+
+#fileInput {
+  display: none;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media(min-width:700px) {
+  #app {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .welcome {
+    padding-top: 65px;
+  }
+
+  .composer-wrap {
+    bottom: 72px;
+  }
+
+  .msg {
+    font-size: 15px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <div class="app-container">
+<div id="app">
 
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-logo">T</div>
-        <div class="brand-name">THEURIQ-AI</div>
+  <header>
+    <div class="brand">
+      <div class="logo">T</div>
+      <span>THEURIQ-AI</span>
+    </div>
+
+    <button id="menuToggle" class="icon-btn"
+      type="button" aria-label="Open menu" aria-expanded="false">
+      ☰
+    </button>
+  </header>
+
+  <main id="screen">
+
+    <section id="welcome" class="welcome">
+      <div class="eyebrow">YOUR PERSONAL INTELLIGENCE STUDIO</div>
+
+      <h1>What can I help you build?</h1>
+
+      <p>
+        Think bigger. Explore ideas.<br>
+        Create something extraordinary.
+      </p>
+
+      <section class="capabilities">
+        <h2>EXPLORE THE POSSIBILITIES</h2>
+
+        <div class="cap-grid">
+
+          <button class="cap-card" type="button"
+            data-prompt="Help me write code for a software project">
+            <span class="cap-icon">⌘</span>
+            Coding
+          </button>
+
+          <button class="cap-card" type="button"
+            data-prompt="Help me research a topic in detail">
+            <span class="cap-icon">⌕</span>
+            Research
+          </button>
+
+          <button class="cap-card" type="button"
+            data-prompt="Help me create an image">
+            <span class="cap-icon">✧</span>
+            Image creation
+          </button>
+
+          <button class="cap-card" type="button"
+            data-prompt="Help me develop and improve an idea">
+            <span class="cap-icon">✦</span>
+            Ideas &amp; learning
+          </button>
+
+        </div>
+      </section>
+    </section>
+
+    <section id="conversation" hidden aria-live="polite"></section>
+
+    <section id="panel" hidden></section>
+
+  </main>
+</div>
+
+<!-- MESSAGE BOX: OUTSIDE THE WELCOME SECTION -->
+<div class="composer-wrap" id="composerWrap">
+  <div class="composer">
+
+    <textarea
+      id="messageInput"
+      rows="1"
+      placeholder="Message THEURIQ-AI..."
+      aria-label="Message THEURIQ-AI"
+    ></textarea>
+
+    <div class="composer-bottom">
+      <div class="tools">
+        <button id="attachButton" class="tool-btn" type="button">
+          ＋ Attach
+        </button>
+
+        <span class="model-tag">AI MODEL: AUTO</span>
       </div>
 
-      <button
-        id="menuToggle"
-        class="icon-button"
-        type="button"
-        aria-label="Open menu"
-        aria-expanded="false"
-      >☰</button>
-    </header>
-
-    <main>
-
-      <section class="welcome-area" id="welcomeArea">
-
-        <div class="welcome-label">
-          YOUR PERSONAL INTELLIGENCE STUDIO
-        </div>
-
-        <h1>What can I help you build?</h1>
-
-        <p>
-          Think bigger. Explore ideas.<br>
-          Create something extraordinary.
-        </p>
-
-        <div class="composer" id="composer">
-
-          <textarea
-            id="messageInput"
-            placeholder="Ask THEURIQ anything..."
-            rows="2"
-          ></textarea>
-
-          <div class="composer-footer">
-
-            <div class="composer-tools">
-              <button
-                id="attachButton"
-                class="tool-button"
-                type="button"
-              >＋ Attach</button>
-
-              <span class="model-label">AI MODEL: AUTO</span>
-            </div>
-
-            <button
-              id="sendButton"
-              class="send-button"
-              type="button"
-              aria-label="Send message"
-            >↑</button>
-
-          </div>
-        </div>
-
-        <section class="explore-section">
-          <h2>EXPLORE THE POSSIBILITIES</h2>
-
-          <div class="capability-grid">
-
-            <button
-              class="capability-card"
-              type="button"
-              data-prompt="Help me write code for a software project"
-            >
-              <span class="capability-icon">⌘</span>
-              <span>Coding</span>
-            </button>
-
-            <button
-              class="capability-card"
-              type="button"
-              data-prompt="Help me research a topic in detail"
-            >
-              <span class="capability-icon">⌕</span>
-              <span>Research</span>
-            </button>
-
-            <button
-              class="capability-card"
-              type="button"
-              data-prompt="Help me create an image"
-            >
-              <span class="capability-icon">✧</span>
-              <span>Image creation</span>
-            </button>
-
-            <button
-              class="capability-card"
-              type="button"
-              data-prompt="Help me develop and improve an idea"
-            >
-              <span class="capability-icon">✦</span>
-              <span>Ideas &amp; learning</span>
-            </button>
-
-          </div>
-        </section>
-      </section>
-
-      <section
-        id="conversation"
-        class="conversation"
-        hidden
-      ></section>
-
-      <section id="otherPanel" hidden></section>
-
-    </main>
-
-    <nav class="bottom-navigation">
-
-      <button
-        class="bottom-nav-item active"
-        type="button"
-        data-panel="chat"
-      >
-        <span>◉</span>
-        <small>Chat</small>
+      <button id="sendButton" class="send-btn"
+        type="button" aria-label="Send message">
+        ↑
       </button>
-
-      <button
-        class="bottom-nav-item"
-        type="button"
-        data-panel="projects"
-      >
-        <span>▣</span>
-        <small>Projects</small>
-      </button>
-
-      <button
-        class="bottom-nav-item"
-        type="button"
-        data-panel="history"
-      >
-        <span>◷</span>
-        <small>History</small>
-      </button>
-
-      <button
-        class="bottom-nav-item"
-        type="button"
-        data-panel="settings"
-      >
-        <span>⚙</span>
-        <small>Settings</small>
-      </button>
-
-    </nav>
-
-    <div id="notification" hidden></div>
-
-  </div>
-
-  <div id="menuOverlay" class="menu-overlay">
-
-    <div class="side-menu">
-
-      <div class="menu-heading">THEURIQ-AI MENU</div>
-
-      <button class="menu-item" type="button" data-action="new">
-        ＋ New conversation
-      </button>
-
-      <button class="menu-item" type="button" data-action="chat">
-        ◉ AI Assistant
-      </button>
-
-      <button class="menu-item" type="button" data-action="projects">
-        ▣ My Projects
-      </button>
-
-      <button class="menu-item" type="button" data-action="history">
-        ◷ Conversation History
-      </button>
-
-      <button class="menu-item" type="button" data-action="settings">
-        ⚙ Settings
-      </button>
-
-      <button class="menu-item" type="button" data-action="close">
-        ✕ Close menu
-      </button>
-
     </div>
-  </div>
 
-  <script src="/js/app.js" defer></script>
+  </div>
+</div>
+
+<input id="fileInput" type="file"
+  accept="image/*,.pdf,.txt,.doc,.docx">
+
+<!-- BOTTOM NAVIGATION -->
+<nav class="bottom-nav" aria-label="Main navigation">
+
+  <button class="nav-btn active" data-panel="chat" type="button">
+    <span class="nav-icon">◉</span>
+    <span>Chat</span>
+  </button>
+
+  <button class="nav-btn" data-panel="projects" type="button">
+    <span class="nav-icon">▣</span>
+    <span>Projects</span>
+  </button>
+
+  <button class="nav-btn" data-panel="history" type="button">
+    <span class="nav-icon">◷</span>
+    <span>History</span>
+  </button>
+
+  <button class="nav-btn" data-panel="settings" type="button">
+    <span class="nav-icon">⚙</span>
+    <span>Settings</span>
+  </button>
+
+</nav>
+
+<!-- HAMBURGER MENU -->
+<div id="menuOverlay" class="menu-overlay" aria-hidden="true">
+
+  <aside class="side-menu" aria-label="THEURIQ-AI menu">
+
+    <div class="menu-top">
+      <span>THEURIQ-AI MENU</span>
+
+      <button id="closeMenu" class="icon-btn"
+        type="button" aria-label="Close menu">
+        ×
+      </button>
+    </div>
+
+    <button class="menu-item" data-action="new" type="button">
+      ＋ New conversation
+    </button>
+
+    <button class="menu-item" data-action="chat" type="button">
+      ◉ AI Assistant
+    </button>
+
+    <button class="menu-item" data-action="projects" type="button">
+      ▣ My Projects
+    </button>
+
+    <button class="menu-item" data-action="history" type="button">
+      ◷ Conversation History
+    </button>
+
+    <button class="menu-item" data-action="settings" type="button">
+      ⚙ Settings
+    </button>
+
+  </aside>
+</div>
+
+<div id="toast" hidden></div>
+
+<script>
+"use strict";
+
+(() => {
+
+  const $ = (selector) => document.querySelector(selector);
+
+  const welcome = $("#welcome");
+  const conversation = $("#conversation");
+  const panel = $("#panel");
+  const composerWrap = $("#composerWrap");
+  const input = $("#messageInput");
+  const sendButton = $("#sendButton");
+  const menu = $("#menuOverlay");
+  const toastBox = $("#toast");
+
+  let sending = false;
+  let currentMessages = [];
+  let history = [];
+  let toastTimer;
+
+  try {
+    history = JSON.parse(
+      localStorage.getItem("theuriq_history") || "[]"
+    );
+
+    if (!Array.isArray(history)) history = [];
+
+  } catch (_) {
+    history = [];
+  }
+
+  function toast(message) {
+    toastBox.textContent = message;
+    toastBox.hidden = false;
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
+      toastBox.hidden = true;
+    }, 2800);
+  }
+
+  function saveHistory() {
+    try {
+      localStorage.setItem(
+        "theuriq_history",
+        JSON.stringify(history.slice(0, 30))
+      );
+    } catch (_) {}
+  }
+
+  function setNav(name) {
+    document.querySelectorAll(".nav-btn").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.panel === name
+      );
+    });
+  }
+
+  function showChat() {
+    welcome.hidden = currentMessages.length > 0;
+    conversation.hidden = currentMessages.length === 0;
+    panel.hidden = true;
+    composerWrap.hidden = false;
+
+    setNav("chat");
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth"
+    });
+  }
+
+  function addMessage(role, text, isError = false) {
+
+    const article = document.createElement("article");
+
+    article.className =
+      "msg " + role + (isError ? " error" : "");
+
+    const label = document.createElement("span");
+    label.className = "msg-label";
+
+    label.textContent =
+      role === "user" ? "YOU" : "THEURIQ-AI";
+
+    const body = document.createElement("div");
+    body.textContent = text;
+
+    article.append(label, body);
+    conversation.appendChild(article);
+
+    return body;
+  }
+
+  function showPanel(name) {
+
+    welcome.hidden = true;
+    conversation.hidden = true;
+    panel.hidden = false;
+    composerWrap.hidden = true;
+
+    setNav(name);
+    panel.replaceChildren();
+
+    const card = document.createElement("div");
+    card.className = "panel-card";
+
+    const heading = document.createElement("h2");
+    const desc = document.createElement("p");
+
+    desc.className = "muted";
+
+    if (name === "projects") {
+
+      heading.textContent = "My Projects";
+
+      desc.textContent =
+        "Your project workspace. Project management and saving will be added here. Your AI chat is available under Chat.";
+
+    } else if (name === "history") {
+
+      heading.textContent = "Conversation History";
+
+      desc.textContent = history.length
+        ? "Select a conversation to reopen it on this device."
+        : "Your saved conversations will appear here.";
+
+    } else {
+
+      heading.textContent = "Settings";
+
+      desc.textContent =
+        "THEURIQ-AI uses the provider and model configured securely on the server. API keys are never stored in this browser.";
+    }
+
+    card.append(heading, desc);
+
+    if (name === "history" && history.length) {
+
+      history.forEach((item, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "history-item";
+        button.type = "button";
+
+        button.textContent =
+          item.title || ("Conversation " + (index + 1));
+
+        button.addEventListener("click", () => {
+
+          currentMessages = Array.isArray(item.messages)
+            ? item.messages
+            : [];
+
+          conversation.replaceChildren();
+
+          currentMessages.forEach(message => {
+            addMessage(message.role, message.content);
+          });
+
+          showChat();
+        });
+
+        card.appendChild(button);
+
+      });
+    }
+
+    if (name === "projects") {
+
+      const newChat = document.createElement("button");
+
+      newChat.className = "panel-action";
+      newChat.type = "button";
+      newChat.textContent = "Start a project conversation";
+
+      newChat.addEventListener("click", startNewChat);
+
+      card.appendChild(newChat);
+    }
+
+    panel.appendChild(card);
+  }
+
+  function openMenu() {
+
+    menu.classList.add("open");
+    menu.setAttribute("aria-hidden", "false");
+
+    $("#menuToggle").setAttribute("aria-expanded", "true");
+  }
+
+  function closeMenu() {
+
+    menu.classList.remove("open");
+    menu.setAttribute("aria-hidden", "true");
+
+    $("#menuToggle").setAttribute("aria-expanded", "false");
+  }
+
+  function startNewChat() {
+
+    if (sending) {
+      toast("Please wait for the current reply.");
+      return;
+    }
+
+    if (currentMessages.length) {
+
+      history.unshift({
+        title:
+          currentMessages.find(message => message.role === "user")
+            ?.content?.slice(0, 65) || "New conversation",
+
+        messages: currentMessages.slice(),
+        savedAt: Date.now()
+      });
+
+      saveHistory();
+    }
+
+    currentMessages = [];
+
+    conversation.replaceChildren();
+
+    input.value = "";
+    input.style.height = "auto";
+
+    showChat();
+    closeMenu();
+    input.focus();
+  }
+
+  async function sendMessage() {
+
+    if (sending) return;
+
+    const prompt = input.value.trim();
+
+    if (!prompt) {
+      toast("Type a message first.");
+      input.focus();
+      return;
+    }
+
+    currentMessages.push({
+      role: "user",
+      content: prompt
+    });
+
+    welcome.hidden = true;
+    panel.hidden = true;
+    conversation.hidden = false;
+    composerWrap.hidden = false;
+
+    addMessage("user", prompt);
+
+    input.value = "";
+    input.style.height = "auto";
+
+    sending = true;
+
+    sendButton.disabled = true;
+    sendButton.textContent = "…";
+
+    const answerNode = addMessage(
+      "assistant",
+      "THEURIQ-AI is thinking..."
+    );
+
+    try {
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          message: prompt
+        })
+      });
+
+      const raw = await response.text();
+
+      let data;
+
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch (_) {
+        throw new Error(
+          "The server returned an unreadable response (HTTP " +
+          response.status + ")."
+        );
+      }
+
+      if (!response.ok || data.ok === false) {
+
+        const detail = data.details
+          ? " — " + data.details
+          : "";
+
+        throw new Error(
+          (data.error || "AI request failed (HTTP " +
+          response.status + ")") + detail
+        );
+      }
+
+      const answer =
+        data.response ||
+        data.reply ||
+        data.message ||
+        data.text ||
+        data.answer;
+
+      if (typeof answer !== "string" || !answer.trim()) {
+        throw new Error(
+          "The AI provider returned an empty reply."
+        );
+      }
+
+      answerNode.textContent = answer;
+
+      currentMessages.push({
+        role: "assistant",
+        content: answer
+      });
+
+    } catch (error) {
+
+      console.error("THEURIQ chat error:", error);
+
+      const errorText = error && error.message
+        ? error.message
+        : "Unknown connection error";
+
+      answerNode.textContent =
+        "I couldn't complete your request. " + errorText;
+
+      answerNode.parentElement.classList.add("error");
+
+      currentMessages.push({
+        role: "assistant",
+        content: answerNode.textContent
+      });
+
+      toast("AI request failed. See the message for details.");
+
+    } finally {
+
+      sending = false;
+
+      sendButton.disabled = false;
+      sendButton.textContent = "↑";
+
+      input.focus();
+
+      window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  }
+
+  /* SEND BUTTON */
+
+  sendButton.addEventListener("click", sendMessage);
+
+  input.addEventListener("keydown", event => {
+
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+
+  });
+
+  /* AUTO-GROW MESSAGE BOX */
+
+  input.addEventListener("input", () => {
+
+    input.style.height = "auto";
+
+    input.style.height =
+      Math.min(input.scrollHeight, 150) + "px";
+
+  });
+
+  /* ATTACHMENT BUTTON */
+
+  $("#attachButton").addEventListener("click", () => {
+    $("#fileInput").click();
+  });
+
+  $("#fileInput").addEventListener("change", event => {
+
+    const file = event.target.files[0];
+
+    if (file) {
+      toast(
+        "Selected " + file.name +
+        ". File upload is not connected yet."
+      );
+    }
+
+    event.target.value = "";
+  });
+
+  /* HAMBURGER MENU */
+
+  $("#menuToggle").addEventListener("click", openMenu);
+
+  $("#closeMenu").addEventListener("click", closeMenu);
+
+  menu.addEventListener("click", event => {
+
+    if (event.target === menu) {
+      closeMenu();
+    }
+
+  });
+
+  document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+
+  });
+
+  /* MENU OPTIONS */
+
+  menu.querySelectorAll("[data-action]").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const action = button.dataset.action;
+
+      closeMenu();
+
+      if (action === "new") {
+        startNewChat();
+      } else if (action === "chat") {
+        showChat();
+      } else {
+        showPanel(action);
+      }
+
+    });
+
+  });
+
+  /* BOTTOM NAVIGATION */
+
+  document.querySelectorAll(".nav-btn").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const name = button.dataset.panel;
+
+      if (name === "chat") {
+        showChat();
+      } else {
+        showPanel(name);
+      }
+
+    });
+
+  });
+
+  /* CAPABILITY CARDS */
+
+  document.querySelectorAll(".cap-card").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      input.value = button.dataset.prompt || "";
+
+      input.focus();
+
+      input.style.height = "auto";
+
+      input.style.height =
+        Math.min(input.scrollHeight, 150) + "px";
+
+      showChat();
+
+    });
+
+  });
+
+  /* INITIALIZE */
+
+  showChat();
+
+  fetch("/api/health")
+    .then(response => response.json())
+    .then(data => {
+      console.log("THEURIQ backend health:", data);
+    })
+    .catch(error => {
+      console.warn("THEURIQ health check failed:", error);
+    });
+
+  console.log("THEURIQ-AI single-file frontend ready.");
+
+})();
+</script>
 
 </body>
 </html>
