@@ -2,36 +2,37 @@
 "use strict";
 
 // ================================================
-// THEURIQ-AI — COMPLETE FRONTEND JAVASCRIPT
+// THEURIQ-AI — FRONTEND ENGINE
 // ================================================
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ==============================================
-  // CONFIGURATION
-  // ==============================================
-
   const API_BASE = "/api";
 
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => document.querySelectorAll(selector);
+
   const elements = {
-    messageInput: document.getElementById("messageInput"),
-    sendButton: document.getElementById("sendButton"),
-    attachButton: document.getElementById("attachButton"),
-    welcomeArea: document.getElementById("welcomeArea"),
-    conversation: document.getElementById("conversation"),
-    notification: document.getElementById("notification"),
-    menuToggle: document.getElementById("menuToggle")
+    messageInput: $("#messageInput"),
+    sendButton: $("#sendButton"),
+    attachButton: $("#attachButton"),
+    welcomeArea: $("#welcomeArea"),
+    conversation: $("#conversation"),
+    notification: $("#notification"),
+    menuToggle: $("#menuToggle"),
+    menuOverlay: $("#menuOverlay"),
+    otherPanel: $("#otherPanel")
   };
 
   let messages = [];
   let isSending = false;
+  let activePanel = "chat";
 
   // ==============================================
   // NOTIFICATIONS
   // ==============================================
 
   function showToast(message) {
-
     if (!elements.notification) {
       console.log(message);
       return;
@@ -52,28 +53,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==============================================
 
   function showWelcome() {
-
     if (elements.welcomeArea) {
-      elements.welcomeArea.style.display = "block";
       elements.welcomeArea.hidden = false;
+      elements.welcomeArea.style.display = "";
     }
 
     if (elements.conversation) {
-      elements.conversation.style.display = "none";
       elements.conversation.hidden = true;
+      elements.conversation.style.display = "none";
     }
   }
 
   function showConversation() {
-
     if (elements.welcomeArea) {
-      elements.welcomeArea.style.display = "none";
       elements.welcomeArea.hidden = true;
+      elements.welcomeArea.style.display = "none";
     }
 
     if (elements.conversation) {
-      elements.conversation.style.display = "flex";
       elements.conversation.hidden = false;
+      elements.conversation.style.display = "flex";
     }
   }
 
@@ -82,64 +81,56 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==============================================
 
   function addMessage(content, role = "user") {
-
     if (!elements.conversation) return null;
 
     showConversation();
 
     const message = document.createElement("div");
-
     message.className =
       role === "user" ? "message user" : "message assistant";
 
     const label = document.createElement("span");
-
     label.className = "message-role";
-
     label.textContent =
       role === "user" ? "YOU" : "THEURIQ-AI";
 
     const body = document.createElement("div");
-
     body.className = "message-content";
     body.textContent = content;
 
     message.append(label, body);
-
     elements.conversation.appendChild(message);
 
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth"
+    message.scrollIntoView({
+      behavior: "smooth",
+      block: "end"
     });
 
     return body;
   }
 
   // ==============================================
-  // API RESPONSE HANDLING
+  // SERVER RESPONSE
   // ==============================================
 
   async function readResponse(response) {
-
     const raw = await response.text();
 
-    let data = {};
+    let data;
 
     try {
       data = raw ? JSON.parse(raw) : {};
     } catch {
       throw new Error(
-        "The server returned an invalid response. Check your backend."
+        "Invalid server response. Check your backend."
       );
     }
 
     if (!response.ok) {
-
       throw new Error(
         data.error ||
         data.message ||
-        `Server error: ${response.status}`
+        `Server error ${response.status}`
       );
     }
 
@@ -147,17 +138,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==============================================
-  // SEND MESSAGE TO REAL AI BACKEND
+  // AI CHAT
   // ==============================================
 
   async function sendMessage() {
-
     if (!elements.messageInput || isSending) return;
 
     const prompt = elements.messageInput.value.trim();
 
     if (!prompt) {
-      showToast("Please enter a message first.");
+      showToast("Enter a message first.");
+      return;
+    }
+
+    if (!elements.conversation) {
+      showToast("Chat interface is missing.");
       return;
     }
 
@@ -184,27 +179,24 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     try {
-
       const response = await fetch(`${API_BASE}/chat`, {
-
         method: "POST",
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
           message: prompt
         })
-
       });
 
       const data = await readResponse(response);
 
       const answer =
+        data.response ||
         data.reply ||
         data.message ||
-        data.response;
+        data.text ||
+        data.answer;
 
       if (!answer) {
         throw new Error("The AI returned an empty response.");
@@ -220,26 +212,23 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     } catch (error) {
+      console.error("THEURIQ-AI:", error);
 
-      console.error("THEURIQ-AI error:", error);
-
-      const errorMessage =
+      const message =
         "I couldn't complete your request. " +
         error.message;
 
       if (thinking) {
-        thinking.textContent = errorMessage;
+        thinking.textContent = message;
       }
 
       messages.push({
         role: "assistant",
-        content: errorMessage
+        content: message
       });
 
-      showToast("AI request failed. Check your connection.");
-
+      showToast("AI request failed.");
     } finally {
-
       isSending = false;
 
       if (elements.sendButton) {
@@ -247,90 +236,169 @@ document.addEventListener("DOMContentLoaded", () => {
         elements.sendButton.textContent = "↑";
       }
 
-      if (elements.messageInput) {
-        elements.messageInput.focus();
-      }
-
+      elements.messageInput.focus();
     }
   }
 
   // ==============================================
-  // SEND BUTTON
+  // INPUT EVENTS
   // ==============================================
 
   if (elements.sendButton) {
-
     elements.sendButton.addEventListener(
       "click",
       sendMessage
     );
-
   }
 
-  // ==============================================
-  // ENTER TO SEND
-  // ==============================================
-
   if (elements.messageInput) {
-
     elements.messageInput.addEventListener(
       "keydown",
-      event => {
-
+      (event) => {
         if (
           event.key === "Enter" &&
           !event.shiftKey
         ) {
-
           event.preventDefault();
           sendMessage();
-
         }
-
       }
     );
-
-    // Automatically expand textarea
 
     elements.messageInput.addEventListener(
       "input",
       () => {
-
         elements.messageInput.style.height = "auto";
-
         elements.messageInput.style.height =
           elements.messageInput.scrollHeight + "px";
-
       }
     );
-
   }
 
   // ==============================================
-  // EXPLORE SHORTCUTS
+  // NEW CONVERSATION
   // ==============================================
 
-  document.querySelectorAll(".capability-card").forEach(card => {
+  function startNewConversation() {
+    if (isSending) {
+      showToast("Wait for the current response.");
+      return;
+    }
 
+    messages = [];
+
+    if (elements.conversation) {
+      elements.conversation.replaceChildren();
+    }
+
+    if (elements.messageInput) {
+      elements.messageInput.value = "";
+    }
+
+    showWelcome();
+    navigate("chat");
+
+    showToast("New conversation started.");
+  }
+
+  // ==============================================
+  // NAVIGATION PANELS
+  // ==============================================
+
+  function navigate(panel) {
+    activePanel = panel;
+
+    $$(".bottom-nav-item").forEach((button) => {
+      button.classList.toggle(
+        "active",
+        button.dataset.panel === panel
+      );
+    });
+
+    if (panel === "chat") {
+      if (elements.otherPanel) {
+        elements.otherPanel.hidden = true;
+      }
+
+      if (messages.length === 0) {
+        showWelcome();
+      } else {
+        showConversation();
+      }
+
+      return;
+    }
+
+    if (elements.welcomeArea) {
+      elements.welcomeArea.hidden = true;
+      elements.welcomeArea.style.display = "none";
+    }
+
+    if (elements.conversation) {
+      elements.conversation.hidden = true;
+      elements.conversation.style.display = "none";
+    }
+
+    const titles = {
+      projects: "My Projects",
+      history: "Recent History",
+      settings: "Settings"
+    };
+
+    const descriptions = {
+      projects: "Your workspace for creating and managing projects.",
+      history: "Your recent conversations will appear here.",
+      settings: "Manage your THEURIQ-AI preferences."
+    };
+
+    if (elements.otherPanel) {
+      elements.otherPanel.hidden = false;
+      elements.otherPanel.style.display = "block";
+
+      elements.otherPanel.replaceChildren();
+
+      const heading = document.createElement("h2");
+      heading.textContent = titles[panel] || "Workspace";
+
+      const description = document.createElement("p");
+      description.textContent =
+        descriptions[panel] || "This section is unavailable.";
+
+      elements.otherPanel.append(heading, description);
+    } else {
+      showToast(
+        `${titles[panel] || "Section"} panel is unavailable in this HTML.`
+      );
+    }
+  }
+
+  $$(".bottom-nav-item").forEach((button) => {
+    button.addEventListener("click", () => {
+      navigate(button.dataset.panel);
+    });
+  });
+
+  // ==============================================
+  // CAPABILITY CARDS
+  // ==============================================
+
+  $$(".capability-card").forEach((card) => {
     card.addEventListener("click", () => {
-
-      const prompt = card.getAttribute("data-prompt");
+      const prompt = card.dataset.prompt;
 
       if (!prompt || !elements.messageInput) return;
 
-      showWelcome();
+      navigate("chat");
 
       elements.messageInput.value = prompt;
       elements.messageInput.focus();
 
-      showToast("Your prompt is ready. Press send.");
-
+      showToast("Prompt ready. Press send.");
     });
-
   });
 
   // ==============================================
-  // FILE ATTACHMENT SELECTION
+  // FILE ATTACHMENTS
   // ==============================================
 
   const fileInput = document.createElement("input");
@@ -342,253 +410,88 @@ document.addEventListener("DOMContentLoaded", () => {
   document.body.appendChild(fileInput);
 
   if (elements.attachButton) {
-
     elements.attachButton.addEventListener("click", () => {
       fileInput.click();
     });
-
   }
 
   fileInput.addEventListener("change", () => {
-
     const file = fileInput.files[0];
 
     if (!file) return;
 
     showToast(
-      `Selected: ${file.name}. Upload processing is not implemented yet.`
+      `Selected: ${file.name}. File processing is not connected yet.`
     );
 
     fileInput.value = "";
-
-  });
-
-  // ==============================================
-  // BOTTOM NAVIGATION
-  // ==============================================
-
-  function navigate(panel) {
-
-    document.querySelectorAll(".bottom-nav-item").forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.panel === panel
-      );
-
-    });
-
-    switch (panel) {
-
-      case "chat":
-
-        if (messages.length === 0) {
-          showWelcome();
-        } else {
-          showConversation();
-        }
-
-        break;
-
-      case "projects":
-
-        showToast("My Projects is coming in a future update.");
-        break;
-
-      case "history":
-
-        showToast("Conversation history is not implemented yet.");
-        break;
-
-      case "settings":
-
-        showToast("Settings is coming in a future update.");
-        break;
-
-      default:
-
-        showToast("This section is not available yet.");
-
-    }
-  }
-
-  document.querySelectorAll(".bottom-nav-item").forEach(button => {
-
-    button.addEventListener("click", () => {
-
-      navigate(button.dataset.panel);
-
-    });
-
   });
 
   // ==============================================
   // HAMBURGER MENU
   // ==============================================
 
-  const menu = document.createElement("div");
-
-  menu.id = "theuriqMenu";
-
-  menu.style.cssText = `
-    position:fixed;
-    top:75px;
-    right:16px;
-    width:230px;
-    padding:12px;
-    background:#191824;
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:16px;
-    box-shadow:0 15px 40px rgba(0,0,0,.5);
-    z-index:99999;
-    display:none;
-  `;
-
-  const menuItems = [
-    ["＋", "New conversation", "new"],
-    ["◈", "AI Assistant", "chat"],
-    ["▣", "My Projects", "projects"],
-    ["◷", "Recent History", "history"],
-    ["⚙", "Settings", "settings"]
-  ];
-
-  menuItems.forEach(([icon, title, action]) => {
-
-    const button = document.createElement("button");
-
-    button.type = "button";
-    button.textContent = `${icon}   ${title}`;
-
-    button.style.cssText = `
-      display:block;
-      width:100%;
-      padding:14px;
-      margin:3px 0;
-      background:transparent;
-      color:white;
-      border:0;
-      border-radius:9px;
-      text-align:left;
-      font-size:14px;
-      cursor:pointer;
-    `;
-
-    button.addEventListener("click", () => {
-
-      menu.style.display = "none";
-
-      if (action === "new") {
-        startNewConversation();
+  if (elements.menuToggle) {
+    elements.menuToggle.addEventListener("click", () => {
+      if (elements.menuOverlay) {
+        elements.menuOverlay.classList.toggle("active");
+        elements.menuOverlay.hidden =
+          !elements.menuOverlay.hidden;
       } else {
-        navigate(action);
+        showToast("Menu overlay is missing from the HTML.");
+      }
+    });
+  }
+
+  if (elements.menuOverlay) {
+    elements.menuOverlay.addEventListener("click", (event) => {
+      if (
+        event.target === elements.menuOverlay ||
+        event.target.closest("[data-close-menu]")
+      ) {
+        elements.menuOverlay.classList.remove("active");
+        elements.menuOverlay.hidden = true;
       }
 
+      const item = event.target.closest("[data-panel]");
+
+      if (item) {
+        navigate(item.dataset.panel);
+        elements.menuOverlay.classList.remove("active");
+        elements.menuOverlay.hidden = true;
+      }
     });
-
-    menu.appendChild(button);
-
-  });
-
-  document.body.appendChild(menu);
-
-  if (elements.menuToggle) {
-
-    elements.menuToggle.addEventListener("click", event => {
-
-      event.stopPropagation();
-
-      menu.style.display =
-        menu.style.display === "none" ? "block" : "none";
-
-    });
-
-  }
-
-  document.addEventListener("click", event => {
-
-    if (
-      !menu.contains(event.target) &&
-      !event.target.closest("#menuToggle")
-    ) {
-
-      menu.style.display = "none";
-
-    }
-
-  });
-
-  // ==============================================
-  // NEW CONVERSATION
-  // ==============================================
-
-  function startNewConversation() {
-
-    if (isSending) {
-      showToast("Please wait for the current response.");
-      return;
-    }
-
-    messages = [];
-
-    if (elements.conversation) {
-      elements.conversation.replaceChildren();
-    }
-
-    showWelcome();
-
-    if (elements.messageInput) {
-      elements.messageInput.value = "";
-    }
-
-    document.querySelectorAll(".bottom-nav-item").forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        button.dataset.panel === "chat"
-      );
-
-    });
-
-    showToast("New conversation started.");
-
   }
 
   // ==============================================
-  // BACKEND CONNECTION CHECK
+  // BACKEND CONNECTION
   // ==============================================
 
   async function checkBackend() {
-
     try {
-
       const response = await fetch(`${API_BASE}/health`);
-
       const data = await readResponse(response);
 
       console.log(
         "THEURIQ-AI backend:",
-        data.ok ? "Online" : "Not confirmed"
+        data.ok ? "Online" : "Response received"
       );
-
     } catch (error) {
-
-      console.error(
-        "Backend connection check failed:",
-        error
-      );
-
+      console.error("Backend connection failed:", error);
     }
-
   }
 
   // ==============================================
-  // INITIALIZE
+  // INITIALIZATION
   // ==============================================
 
-  showWelcome();
+  if (elements.otherPanel) {
+    elements.otherPanel.hidden = true;
+  }
 
+  showWelcome();
   checkBackend();
 
-  console.log("THEURIQ-AI initialized successfully.");
+  console.log("THEURIQ-AI frontend initialized.");
 
 });
